@@ -1,0 +1,16 @@
+{
+  "license": "ISC",
+  "author": "",
+  "name": "planning",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "infra_diagrams": "live-server --open=./infrastructure_diagrams ."
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^10.6.1",
+    "live-server": "^1.2.2",
+    "mermaid": "^10.6.1"
+  }
+}

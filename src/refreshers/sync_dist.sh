@@ -1,0 +1,1 @@
+../api_resources/path/sync/handler/create_dist.sh

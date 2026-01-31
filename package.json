@@ -1,0 +1,22 @@
+{
+  "name": "ai_phrases_api",
+  "version": "1.0.0",
+  "description": "```mermaid     flowchart LR",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SHerlihy/ai_phrases_api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SHerlihy/ai_phrases_api/issues"
+  },
+  "homepage": "https://github.com/SHerlihy/ai_phrases_api#readme",
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}
