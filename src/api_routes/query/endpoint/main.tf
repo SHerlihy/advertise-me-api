@@ -15,11 +15,6 @@ variable "invoke_arn" {
   type = string
 }
 
-variable "authorizer_id" {
-  type = string
-}
-
-
 resource "aws_api_gateway_resource" "query" {
   rest_api_id = var.api_bind.api_id
   parent_id   = var.api_bind.resource_id

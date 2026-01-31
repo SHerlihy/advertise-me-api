@@ -1,1 +1,0 @@
-../variables.bucket.tf

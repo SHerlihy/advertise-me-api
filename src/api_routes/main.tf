@@ -22,27 +22,5 @@ module "query" {
 
     api_bind = var.api_bind
 
-    authorizer_id = var.authorizer_id
-
     invoke_arn = var.query_invoke_arn
-}
-
-module "sync" {
-    source = "./sync"
-    
-    api_bind = var.api_bind
-
-    authorizer_id = var.authorizer_id
-
-    invoke_arn = var.sync_invoke_arn
-}
-
-module "source" {
-    source = "./source"
-
-    api_bind = var.api_bind
-
-    authorizer_id = var.authorizer_id
-
-    bucket = var.bucket
 }

@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "kbaas"
+  profile = "advertise"
 }
 
 variable "stage_uid" {
@@ -19,7 +19,7 @@ variable "api_id" {
   type = string
 }
 
-resource "aws_api_gateway_deployment" "kbaas" {
+resource "aws_api_gateway_deployment" "advertise" {
   rest_api_id = var.api_id 
 
   lifecycle {
@@ -27,12 +27,12 @@ resource "aws_api_gateway_deployment" "kbaas" {
   }
 }
 
-resource "aws_api_gateway_stage" "kbaas" {
+resource "aws_api_gateway_stage" "advertise" {
   rest_api_id = var.api_id
-  deployment_id = aws_api_gateway_deployment.kbaas.id
+  deployment_id = aws_api_gateway_deployment.advertise.id
   stage_name    = var.stage_uid
 }
 
 output "api_path" {
-    value = aws_api_gateway_stage.kbaas.invoke_url
+    value = aws_api_gateway_stage.advertise.invoke_url
 }

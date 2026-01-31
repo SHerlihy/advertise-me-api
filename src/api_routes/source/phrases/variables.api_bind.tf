@@ -1,1 +1,0 @@
-../variables.api_bind.tf
