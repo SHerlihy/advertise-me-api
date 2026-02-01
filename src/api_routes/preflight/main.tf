@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  profile = "kbaas"
-}
-
 data "aws_region" "current" {}
 
 locals {

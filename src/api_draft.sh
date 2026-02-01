@@ -31,7 +31,7 @@ esac
 
 # CREATE RESOURCES
 
-echo "stage_uid = \"${STAGE_UID}\"" >> ./api_resources/terraform.tfvars
+echo "stage_uid = \"${STAGE_UID}\"" > ./api_resources/terraform.tfvars
 
 cat ./variables/shared/api_id.txt >> ./api_resources/terraform.tfvars
 cat ./variables/shared/root_id.txt >> ./api_resources/terraform.tfvars
@@ -43,7 +43,7 @@ terraform -chdir=./api_resources apply $AUTO
 
 # CREATE VARIABLE OBJECTS
 
-cat ./variables/shared/api_id.txt >> ./create_objects/terraform.tfvars
+cat ./variables/shared/api_id.txt > ./create_objects/terraform.tfvars
 cat ./variables/shared/root_id.txt >> ./create_objects/terraform.tfvars
 
 terraform -chdir=./create_objects apply --auto-approve

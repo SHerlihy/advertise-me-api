@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  profile = "kbaas"
-}
-
 variable "stage_uid" {
   type = string
 }

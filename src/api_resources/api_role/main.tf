@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  profile = "kbaas"
-}
-
 data "aws_region" "current" {}
 
 data "aws_iam_policy_document" "gateway_assume" {
@@ -40,9 +36,4 @@ resource "aws_iam_role_policy_attachment" "gateway_log" {
 
 resource "aws_api_gateway_account" "kbaas" {
   cloudwatch_role_arn = aws_iam_role.gateway.arn
-}
-
-resource "aws_iam_role_policy_attachment" "bucket_access" {
-  role       = aws_iam_role.gateway.name
-  policy_arn = var.bucket_access_policy
 }

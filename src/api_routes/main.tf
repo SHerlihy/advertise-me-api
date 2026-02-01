@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "kbaas"
+  profile = "sherlihydtcom"
 }
 
 module "preflight" {

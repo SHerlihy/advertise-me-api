@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  profile = "kbaas"
-}
-
 variable "stage_uid" {
   type = string
 }
@@ -21,6 +17,12 @@ variable "execution_arn" {
 
 variable "kb_id" {
   type = string
+}
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
 }
 
 data "archive_file" "query" {
@@ -88,7 +90,7 @@ data "aws_iam_policy_document" "query_knowledge_base" {
       "bedrock:RetrieveAndGenerate"
     ]
     resources = [
-      "arn:aws:bedrock:us-east-1:139161572996:knowledge-base/*"
+      "arn:aws:bedrock:us-east-1:${local.account_id}:knowledge-base/*"
     ]
   }
 

@@ -7,10 +7,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  profile = "kbaas"
-}
-
 variable "invoke_arn" {
   type = string
 }

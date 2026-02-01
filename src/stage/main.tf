@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "advertise"
+  profile = "sherlihydtcom"
 }
 
 variable "stage_uid" {

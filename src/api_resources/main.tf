@@ -8,15 +8,13 @@ terraform {
 }
 
 provider "aws" {
-  profile = "kbaas"
+  profile = "sherlihydtcom"
 }
 
 module "api_role" {
   source = "./api_role"
 
   stage_uid = var.stage_uid
-
-  bucket_access_policy = var.bucket_access_policy
 }
 
 module "paths" {

@@ -1,20 +1,13 @@
 import json
 import os
-import re
-import asyncio
 
 import boto3
-
-from query_utils import Text_To_Sentance_Array
 
 session = boto3.Session()
 bedrock = session.client('bedrock')
 agent = session.client('bedrock-agent-runtime')
 
-def handler(event: dict, context=None):
-    return asyncio.run(main(event, context))
-
-async def main(event, context) -> Respose:
+def handler(event, context) -> Respose:
     response = {
             'headers': {
                 'Access-Control-Allow-Origin': '*',
@@ -24,19 +17,10 @@ async def main(event, context) -> Respose:
             'body': 'Error on init'
         }
 
-    marked = ''
-
-    to_sentances = Text_To_Sentance_Array(event["body"], 17)
-    paragraphs = to_sentances.get_sentances()
-
+    answer = ""
     try:
         query_kb = Query_KB()
-
-        marked_list = await asyncio.gather(
-            *[query_kb.mark_paragraph(p) for p in paragraphs]
-        )
-
-        marked = "".join(marked_list)
+        answer = query_kb.query(event["body"])
 
     except Exception as err:
         print(err.response)
@@ -46,18 +30,16 @@ async def main(event, context) -> Respose:
         return response
 
     response["statusCode"] = 200
-    response["body"] = marked
+    response["body"] = answer
     return response
 
 class Query_KB():
     def __init__(self):
         self.KB_ID = os.environ.get('KB_ID')
 
-        self.agent_profile ='You will be given a Story Extract and must mark the phrase or word that sounds like it was created by AI. \
-        You are only allowed to respond with a marked version of the Story Extract. \
-        You must mark by enclosing the word or phrase in braces. \
-        The following text, enclosed in square brackets, includes high priority examples of words and phrases created by AI [$search_results$]. \
-        The following text, enclosed in square brackets, is the Story Extract for you to return marked [$query$].'
+        self.agent_profile ="You want to advertise Steven Herlihy as a highly competent and fun software engineer that specialises in web development. \
+        The following text, enclosed in square brackets, includes Steven Herlihy's CV / resume [$search_results$]. \
+        The following text, enclosed in square brackets, is the question about Steven Herlihy that you must answer [$query$]."
         
         model_id = "amazon.nova-micro-v1:0"
         fm_res = bedrock.get_foundation_model(
@@ -66,10 +48,10 @@ class Query_KB():
 
         self.fm_arn = fm_res['modelDetails']['modelArn']
 
-    async def mark_paragraph(self, paragraph):
+    def query(self, question):
         inference = agent.retrieve_and_generate(
             input={
-                'text': paragraph
+                'text': question
             },
             retrieveAndGenerateConfiguration={
                 'type': 'KNOWLEDGE_BASE',
