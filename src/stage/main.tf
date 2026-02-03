@@ -33,6 +33,26 @@ resource "aws_api_gateway_stage" "advertise" {
   stage_name    = var.stage_uid
 }
 
+resource "aws_api_gateway_usage_plan" "advertise" {
+  name         = "advertise${var.stage_uid}"
+
+  api_stages {
+    api_id = var.api_id
+    stage  = aws_api_gateway_stage.advertise.stage_name
+  }
+
+  quota_settings {
+    limit  = 99
+    offset = 0
+    period = "DAY"
+  }
+
+  throttle_settings {
+    rate_limit  = 10
+    burst_limit = 5
+  }
+}
+
 output "api_path" {
     value = aws_api_gateway_stage.advertise.invoke_url
 }
