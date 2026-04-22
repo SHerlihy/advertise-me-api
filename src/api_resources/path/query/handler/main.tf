@@ -25,7 +25,18 @@ locals {
   account_id = data.aws_caller_identity.current.account_id
 }
 
+resource "null_resource" "build" {
+  triggers = {
+    src_hash = sha1(join("", [for f in fileset("${path.module}/function", "**") : filesha1("${path.module}/function/${f}")]))
+  }
+
+  provisioner "local-exec" {
+    command = "bash ${path.module}/create_dist.sh"
+  }
+}
+
 data "archive_file" "query" {
+  depends_on = [null_resource.build]
   type             = "zip"
   source_dir = "${path.module}/dist"
   output_path = "${path.module}/my_deployment_package.zip"
@@ -39,7 +50,7 @@ resource "aws_lambda_function" "query" {
   function_name = "${var.stage_uid}Query"
   handler = "lambda_function.handler"
 
-  runtime = "python3.14"
+  runtime = "python3.12"
   architectures = ["x86_64"]
 
   role = aws_iam_role.lambda_exec.arn
