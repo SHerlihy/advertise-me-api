@@ -6,4 +6,5 @@ rm -rf $SCRIPT_PATH/dist
 
 mkdir $SCRIPT_PATH/dist
 
-cp $SCRIPT_PATH/lambda_function.py $SCRIPT_PATH/dist
+cp -r $SCRIPT_PATH/function/* $SCRIPT_PATH/dist
+rm $SCRIPT_PATH/dist/test_snippet.py
