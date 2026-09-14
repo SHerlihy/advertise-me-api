@@ -9,6 +9,7 @@ terraform {
 
 provider "aws" {
   profile = "sherlihydtcom"
+  region  = "us-east-1"
 }
 
 variable "stage_uid" {
