@@ -67,7 +67,7 @@ locals {
 
 # could use fm var
 data "aws_iam_policy_document" "query_knowledge_base" {
-  policy_id = "${var.stage_uid}QueryKnowledgeBase"
+  policy_id = "QueryKnowledgeBase"
   statement {
     effect = "Allow"
     actions = [
@@ -120,7 +120,7 @@ data "archive_file" "query" {
 }
 
 resource "aws_lambda_function" "query" {
-  function_name = "${var.stage_uid}-Query"
+  function_name = "QueryKB"
   filename = "${path.module}/my_deployment_package.zip"
   code_sha256 = data.archive_file.query.output_sha256
   role = aws_iam_role.lambda_exec.arn

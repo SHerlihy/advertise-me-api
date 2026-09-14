@@ -19,10 +19,10 @@ terraform {
 
 provider "aws" {
   profile = "sherlihydtcom"
-  region  = "us-east-1"
 }
 
 locals {
+  stage_name = "dev"
   kb_id = "J1HDISM9SM"
   api_name = "advertise-me"
   route_path = "query"
@@ -66,7 +66,7 @@ module "deploy_api" {
   version = "0.0.4"
 
   api_id     = module.draft_api.api_id
-  stage_name = "prod"
+  stage_name = local.stage_name
   quota      = local.quota
   throttle   = local.throttle
 
