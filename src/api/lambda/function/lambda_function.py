@@ -35,8 +35,8 @@ def get_client() -> KBQuerier:
         session = boto3.Session()
         _CLIENT = KnowledgeBaseClient(
             kb_id=settings.kb_id,
-            bedrock_client=session.client("bedrock"),
-            agent_client=session.client("bedrock-agent-runtime"),
+            bedrock_client=session.client("bedrock", region_name='us-east-1'),
+            agent_client=session.client("bedrock-agent-runtime", region_name='us-east-1'),
         )
     return _CLIENT
 

@@ -14,6 +14,10 @@ variable "route_path" {
   type = string
 }
 
+variable "http_method" {
+  type = string
+}
+
 variable "kb_id" {
   type = string
 }

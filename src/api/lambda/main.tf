@@ -13,7 +13,7 @@ terraform {
 }
 
 locals {
-  http_method = "POST"
+  zip_path = "my_deployment_package.zip"
 }
 
 resource "aws_api_gateway_resource" "route" {
@@ -25,14 +25,10 @@ resource "aws_api_gateway_resource" "route" {
 resource "aws_api_gateway_method" "route" {
   rest_api_id   = var.api_id
   resource_id   = aws_api_gateway_resource.route.id
-  http_method   = local.http_method
+  http_method   = var.http_method
   authorization = "NONE"
-}
 
-data "archive_file" "handler" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda.zip"
+  api_key_required = true
 }
 
 data "aws_iam_policy_document" "lambda_assume_role" {
@@ -49,14 +45,17 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 }
 
 resource "aws_iam_role" "lambda" {
-  name               = var.lambda_role_name
+  name               = "QueryKB"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-#prefer data way
+data "aws_iam_policy" "lambda_basic_execution" {
+  name = "AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
   role       = aws_iam_role.lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  policy_arn = data.aws_iam_policy.lambda_basic_execution.arn
 }
 
 data "aws_caller_identity" "current" {}
@@ -82,7 +81,7 @@ data "aws_iam_policy_document" "query_knowledge_base" {
   statement {
     effect = "Allow"
     actions = [
-			"bedrock:InvokeModel",
+      "bedrock:InvokeModel",
       "bedrock:GetFoundationModel"
     ]
     resources = [
@@ -96,7 +95,7 @@ resource "aws_iam_policy" "query_knowledge_base" {
 }
 
 resource "aws_iam_role_policy_attachment" "query_knowledge_base" {
-  role       = aws_iam_role.lambda_exec.name
+  role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.query_knowledge_base.arn
 }
 
@@ -112,23 +111,23 @@ resource "null_resource" "build" {
 }
 
 data "archive_file" "query" {
-  depends_on = [null_resource.build]
+  depends_on       = [null_resource.build]
   type             = "zip"
-  source_dir = "${path.module}/dist"
-  output_path = "${path.module}/my_deployment_package.zip"
+  source_dir       = "${path.module}/dist"
+  output_path      = "${path.module}/${local.zip_path}"
   output_file_mode = "0666"
 }
 
 resource "aws_lambda_function" "query" {
   function_name = "QueryKB"
-  filename = "${path.module}/my_deployment_package.zip"
-  code_sha256 = data.archive_file.query.output_sha256
-  role = aws_iam_role.lambda_exec.arn
-  handler = "lambda_function.handler"
-  runtime = "python3.12"
+  filename      = "${path.module}/${local.zip_path}"
+  code_sha256   = data.archive_file.query.output_sha256
+  role          = aws_iam_role.lambda.arn
+  handler       = "lambda_function.handler"
+  runtime       = "python3.12"
   architectures = ["x86_64"]
-  timeout = 10
-  memory_size      = 128
+  timeout       = 10
+  memory_size   = 128
 
   environment {
     variables = {
@@ -142,7 +141,7 @@ resource "aws_lambda_permission" "api_gateway" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.query.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${var.execution_arn}/*/${local.http_method}/${var.route_path}"
+  source_arn    = "${var.execution_arn}/*/${var.http_method}/${var.route_path}"
 }
 
 resource "aws_api_gateway_integration" "route" {
@@ -151,7 +150,7 @@ resource "aws_api_gateway_integration" "route" {
   http_method             = aws_api_gateway_method.route.http_method
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.handler.invoke_arn
+  uri                     = aws_lambda_function.query.invoke_arn
 }
 
 output "invoke_arn" {

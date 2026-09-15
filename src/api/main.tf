@@ -11,7 +11,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = ""
+    bucket = "state-bucket-5c8c1de056e072d9bc764e0c2b"
     key    = "advertise_me_api/terraform.tfstate"
     region = "eu-west-2"
   }
@@ -22,10 +22,11 @@ provider "aws" {
 }
 
 locals {
-  stage_name = "dev"
-  kb_id = "J1HDISM9SM"
-  api_name = "advertise-me"
-  route_path = "query"
+  stage_name  = "prod"
+  kb_id       = "J1HDISM9SM"
+  api_name    = "advertise-me"
+  route_path  = "query"
+  http_method = "POST"
   path_to_settings = {
     "*/*" : {
       burst_limit = 999
@@ -45,7 +46,7 @@ locals {
 
 module "draft_api" {
   source  = "SHerlihy/draft-cors-api/aws"
-  version = "0.0.2"
+  version = "0.0.3"
 
   api_name = local.api_name
   tags     = {}
@@ -57,11 +58,13 @@ module "lambda" {
   api_id           = module.draft_api.api_id
   root_resource_id = module.draft_api.root_resource_id
   execution_arn    = module.draft_api.execution_arn
-  route_path = local.route_path
-  kb_id = local.kb_id
+  route_path       = local.route_path
+  http_method      = local.http_method
+  kb_id            = local.kb_id
 }
 
 module "deploy_api" {
+  depends_on = [module.lambda]
   source  = "SHerlihy/deploy-api-public-quota/aws"
   version = "0.0.4"
 
@@ -75,10 +78,10 @@ module "deploy_api" {
   tags = {}
 }
 
-output "access_logs_api_url" {
-  value = module.deploy_api.endpoint
-}
-
-output "access_logs_api_key" {
-  value = module.deploy_api.api_key
+output "endpoint_obj" {
+  value = {
+    endpoint : "${module.deploy_api.endpoint}/${local.route_path}",
+    method : local.http_method,
+    api_key : module.deploy_api.api_key
+  }
 }
